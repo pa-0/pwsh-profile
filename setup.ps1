@@ -11,7 +11,7 @@ function Test-InternetConnection {
         return $true
     }
     catch {
-        Write-Warning "Internet connection is required but not available. Please check your connection."
+        Write-Warning "Download failed. Please check your internet connection and try again."
         return $false
     }
 }
@@ -36,10 +36,11 @@ if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
         if (!(Test-Path -Path $profilePath)) {
             New-Item -Path $profilePath -ItemType "directory"
         }
-
-        Invoke-RestMethod https://github.com/ChrisTitusTech/powershell-profile/raw/main/Microsoft.PowerShell_profile.ps1 -OutFile $PROFILE
-        Write-Host "The profile @ [$PROFILE] has been created."
-        Write-Host "If you want to add any persistent components, please do so at [$profilePath\Profile.ps1] as there is an updater in the installed profile which uses the hash to update the profile and will lead to loss of changes"
+        Invoke-RestMethod https://github.com/poa00/powershell.profile/raw/poa00.profile/Microsoft.PowerShell_profile.ps1 -OutFile $PROFILE
+        Write-Host "'Microsoft.PowerShell_profile.ps1' downloaded successfully."
+        Write-Host "New PowerShell Profile saved @ [$PROFILE]."
+        Write-Host "This profile self-updates automatically at PowerShell startup, and any local changes to 'Microsoft.PowerShell_profile.ps1' will be overwritten."
+        Write-Host "To add further customization that persists through updates, add new configurations to [$profilePath\Profile.ps1]."
     }
     catch {
         Write-Error "Failed to create or update the profile. Error: $_"
@@ -48,9 +49,10 @@ if (!(Test-Path -Path $PROFILE -PathType Leaf)) {
 else {
     try {
         Get-Item -Path $PROFILE | Move-Item -Destination "oldprofile.ps1" -Force
-        Invoke-RestMethod https://github.com/ChrisTitusTech/powershell-profile/raw/main/Microsoft.PowerShell_profile.ps1 -OutFile $PROFILE
-        Write-Host "The profile @ [$PROFILE] has been created and old profile removed."
-        Write-Host "Please back up any persistent components of your old profile to [$HOME\Documents\PowerShell\Profile.ps1] as there is an updater in the installed profile which uses the hash to update the profile and will lead to loss of changes"
+        Invoke-RestMethod https://github.com/poa00/powershell.profile/raw/poa00.profile/Microsoft.PowerShell_profile.ps1 -OutFile $PROFILE -OutFile $PROFILE
+        Write-Host "New profile downloaded and created successfully @ [$PROFILE]. The existing profile, if any, has been renamed to "oldprofile.ps1."
+         Write-Host "This profile self-updates automatically at PowerShell startup, and any local changes to 'Microsoft.PowerShell_profile.ps1' will be overwritten."
+        Write-Host "Save any additional customizations you wish to persist (including from the old profile) to [$HOME\Documents\PowerShell\Profile.ps1].as there is an updater in the installed profile which uses the hash to update the profile and will lead to loss of changes"
     }
     catch {
         Write-Error "Failed to backup and update the profile. Error: $_"
@@ -96,7 +98,7 @@ catch {
 
 # Final check and message to the user
 if ((Test-Path -Path $PROFILE) -and (winget list --name "OhMyPosh" -e) -and ($fontFamilies -contains "CaskaydiaCove NF")) {
-    Write-Host "Setup completed successfully. Please restart your PowerShell session to apply changes."
+    Write-Host "Setup completed successfully. Restart PowerShell session to apply changes."
 } else {
     Write-Warning "Setup completed with errors. Please check the error messages above."
 }

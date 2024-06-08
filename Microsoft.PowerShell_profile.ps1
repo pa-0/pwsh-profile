@@ -15,11 +15,11 @@ function Update-Profile {
     Write-Host "Checking for updates to " -ForegroundColor Yellow -NoNewLine
     Write-Host "PowerShell `$PROFILE" -ForegroundColor Green -NoNewLine
     Write-Host "." -ForegroundColor Yellow -NoNewLine
-    Start-Sleep -Milliseconds 500
+    Start-Sleep -Milliseconds 600
     Write-Host "." -ForegroundColor Yellow -NoNewLine
-    Start-Sleep -Milliseconds 500
+    Start-Sleep -Milliseconds 600
     Write-Host "." -ForegroundColor Yellow -NoNewLine
-    Start-Sleep -Milliseconds 500
+    Start-Sleep -Milliseconds 600
     Write-Host "." -ForegroundColor Yellow
     if (-not $global:canConnectToGitHub) {
         Write-Host "ERROR: Could not connect to GitHub.com. Please check your connection and try again later." -ForegroundColor DarkRed
@@ -181,7 +181,7 @@ function k9 { Stop-Process -Name $args[0] }
 function la { Get-ChildItem -Path . -Force | Format-Table -AutoSize }
 function ll { Get-ChildItem -Path . -Force -Hidden | Format-Table -AutoSize }
 
-# Git
+# Git f(x)'s
 function gs { git status }
 function ga { git add . }
 function gc { param($m) git commit -m "$m" }
@@ -196,8 +196,11 @@ function lazyg {
     git commit -m "$args"
     git push
 }
-function grb { param($owner, $repo) & ghrel -v "${owner}"/"${repo}" } # Run ghrel and downlaod repo binaries
-  
+
+#Git Aliases
+Set-Alias -Name grb  -Value ghrel
+Set-Alias -Name glab -Value gitlab
+Set-Alias -Name glb  -Value gitlab-download-release
 # Quick Access to System Info
 function sysinfo { Get-ComputerInfo }
 

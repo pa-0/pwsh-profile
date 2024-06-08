@@ -1,7 +1,7 @@
-### Version 0.1
-
-# Initial GitHub.com connectivity check with 1 second timeout
-$canConnectToGitHub = Test-Connection github.com -Count 1 -Quiet -TimeoutSeconds 1
+### Microsoft.PowerShell_profile Version
+$global:PoshProfVersionNo = 0.3 
+# Initial GitHub.com connectivity check with 2 second timeout
+$global:canConnectToGitHub = Test-Connection github.com -Count 2 -Quiet -TimeoutSeconds 1
 
 # Import Modules and External Profiles
 # Ensure Terminal-Icons module is installed before importing
@@ -12,19 +12,27 @@ Import-Module -Name Terminal-Icons
 
 # Check for Profile Updates
 function Update-Profile {
+    Write-Host "Checking for updates to " -ForegroundColor DarkYellow -NoNewLine
+    Write-Host "PowerShell `$PROFILE" -ForegroundColor Green -NoNewLine
+    Write-Host "." -ForegroundColor DarkYellow -NoNewLine
+    Start-Sleep -Milliseconds 250
+    Write-Host "." -ForegroundColor DarkYellow -NoNewLine
+    Start-Sleep -Milliseconds 250
+    Write-Host "." -ForegroundColor DarkYellow -NoNewLine
+    Start-Sleep -Milliseconds 250
+    Write-Host "." -ForegroundColor DarkYellow -NoNewLine
     if (-not $global:canConnectToGitHub) {
-        Write-Host "Skipping profile update check due to GitHub.com not responding within 1 second." -ForegroundColor Yellow
+        Write-Host "ERROR: Could not connect to GitHub.com. Please check your connection and try again later." -ForegroundColor DarkRed
         return
-    }
-
-    try {
+    } try {
         $url = "https://raw.githubusercontent.com/poa00/powershell.profile/poa00.profile/Microsoft.PowerShell_profile.ps1"
         $oldhash = Get-FileHash $PROFILE
         Invoke-RestMethod $url -OutFile "$env:temp/Microsoft.PowerShell_profile.ps1"
         $newhash = Get-FileHash "$env:temp/Microsoft.PowerShell_profile.ps1"
         if ($newhash.Hash -ne $oldhash.Hash) {
             Copy-Item -Path "$env:temp/Microsoft.PowerShell_profile.ps1" -Destination $PROFILE -Force
-            Write-Host "Profile has been updated. Please restart your shell to reflect changes" -ForegroundColor Magenta
+            Write-Host "Profile updated successfully." -ForegroundColor Green
+            Write-Host "Restart the shell to apply changes" -ForegroundColor Magenta
         }
     } catch {
         Write-Error "Unable to check for `$profile updates"
@@ -39,7 +47,7 @@ $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIden
 function prompt {
     if ($isAdmin) { "[" + (Get-Location) + "] # " } else { "[" + (Get-Location) + "] $ " }
 }
-$adminSuffix = if ($isAdmin) { " [ADMIN]" } else { "" }
+$adminSuffix = if ($isAdmin) { " [jefe]" } else { "" }
 $Host.UI.RawUI.WindowTitle = "PowerShell {0}$adminSuffix" -f $PSVersionTable.PSVersion.ToString()
 
 # Utility Functions
@@ -50,20 +58,34 @@ function Test-CommandExists {
 }
 
 # Editor Configuration
-$EDITOR = if (Test-CommandExists nvim) { 'nvim' }
+$EDITOR = if (Test-CommandExists nvim) { 'code' }
           elseif (Test-CommandExists pvim) { 'pvim' }
           elseif (Test-CommandExists vim) { 'vim' }
           elseif (Test-CommandExists vi) { 'vi' }
-          elseif (Test-CommandExists code) { 'code' }
+          elseif (Test-CommandExists code) { 'nvimad' }
           elseif (Test-CommandExists notepad++) { 'notepad++' }
           elseif (Test-CommandExists sublime_text) { 'sublime_text' }
           else { 'notepad' }
 Set-Alias -Name vim -Value $EDITOR
 
-function Edit-Profile {
-    vim $PROFILE.CurrentUserAllHosts
-}
+# App Installs
+$appcheck = @(gh, jq, git, ghrel, gh-org, papeer, pandoc, go, py, ffmpeg, 
+# TODO - add logic to limit installs to elevated prompt
+# go install github.com/jreisinger/ghrel@latest
+# go install github.com/lapwat/papeer@latest 
+# ghrel caarlos0/fork-cleaner
+# winget install --id GitHub.cli --scope Machine -s # else winget upgrade
+# winget install --Id jqlang.jq --scope Machine -s # else winget upgrade
+# winget install -Name pandoc --scope Machine
+#  winget install --id GoLang.Go --scope Machine -s
+#$TODL = if (-not (Test-CommandExists gh){  }
+
+# Edit POSH$PROFILE
+function Edit-Profile { vim $PROFILE.CurrentUserAllHosts }
+Set-Alias -Name epah -Value Edit-Profile
+
 function touch($file) { "" | Out-File $file -Encoding ASCII }
+
 function ff($name) {
     Get-ChildItem -recurse -filter "*${name}*" -ErrorAction SilentlyContinue | ForEach-Object {
         Write-Output "$($_.directory)\$($_)"
@@ -82,40 +104,20 @@ function uptime {
     }
 }
 
-function Restart-Profile {
-    & $profile
-}
+function Restart-Profile { & $profile }
 
 function unzip ($file) {
     Write-Output("Extracting", $file, "to", $pwd)
     $fullFile = Get-ChildItem -Path $pwd -Filter $file | ForEach-Object { $_.FullName }
     Expand-Archive -Path $fullFile -DestinationPath $pwd
 }
-function hb {
-    if ($args.Length -eq 0) {
-        Write-Error "No file path specified."
-        return
-    }
-    
-    $FilePath = $args[0]
-    
-    if (Test-Path $FilePath) {
-        $Content = Get-Content $FilePath -Raw
-    } else {
-        Write-Error "File path does not exist."
-        return
-    }
-    
-    $uri = "http://bin.christitus.com/documents"
-    try {
-        $response = Invoke-RestMethod -Uri $uri -Method Post -Body $Content -ErrorAction Stop
-        $hasteKey = $response.key
-        $url = "http://bin.christitus.com/$hasteKey"
-        Write-Output $url
-    } catch {
-        Write-Error "Failed to upload the document. Error: $_"
-    }
-}
+
+function Unblock-Dir { dir -r | Unblock-File }
+function Unblock-Dirv { dir -r | Unblock-File -v }
+Set-Alias -Name rmow -Value Unblock-Dir
+Set Alias -Name rmov -Value Unblock-Dirv
+
+
 function grep($regex, $dir) {
     if ( $dir ) {
         Get-ChildItem $dir | select-string $regex
@@ -161,37 +163,30 @@ function tail {
 # Quick File Creation
 function nf { param($name) New-Item -ItemType "file" -Path . -Name $name }
 
-# Directory Management
+# Create and Change Dir
 function mkcd { param($dir) mkdir $dir -Force; Set-Location $dir }
 
-### Quality of Life Aliases
-
-# Navigation Shortcuts
+# Folder Nav
 function docs { Set-Location -Path $HOME\Documents }
-
 function dtop { Set-Location -Path $HOME\Desktop }
+function dc { cd ..}
 
-# Quick Access to Editing the Profile
+# Edit POSH Profile
 function ep { vim $PROFILE }
 
-# Simplified Process Management
+# Taskkiller
 function k9 { Stop-Process -Name $args[0] }
 
-# Enhanced Listing
+# List
 function la { Get-ChildItem -Path . -Force | Format-Table -AutoSize }
 function ll { Get-ChildItem -Path . -Force -Hidden | Format-Table -AutoSize }
 
-# Git Shortcuts
+# Git
 function gs { git status }
-
 function ga { git add . }
-
 function gc { param($m) git commit -m "$m" }
-
 function gp { git push }
-
-function g { z Github }
-
+function g  { z Github }
 function gcom {
     git add .
     git commit -m "$args"
@@ -201,17 +196,40 @@ function lazyg {
     git commit -m "$args"
     git push
 }
-
-# Quick Access to System Information
+function grb { param($owner, $repo) ghrel "$owner"/"$repo" } # Run ghrel
+  
+# Quick Access to System Info
 function sysinfo { Get-ComputerInfo }
 
-# Networking Utilities
+# Net Tools
 function flushdns { Clear-DnsClientCache }
 
-# Clipboard Utilities
+# Clipboard Tools
 function cpy { Set-Clipboard $args[0] }
-
 function pst { Get-Clipboard }
+
+<#function hb {
+    if ($args.Length -eq 0) {
+        Write-Error "No file path specified."
+        return
+    }
+    $FilePath = $args[0]
+    if (Test-Path $FilePath) {
+        $Content = Get-Content $FilePath -Raw
+    } else {
+        Write-Error "File path does not exist."
+        return
+    }
+    $uri = "http://bin.christitus.com/documents"
+    try {
+        $response = Invoke-RestMethod -Uri $uri -Method Post -Body $Content -ErrorAction Stop
+        $hasteKey = $response.key
+        $url = "http://bin.christitus.com/$hasteKey"
+        Write-Output $url
+    } catch {
+        Write-Error "Failed to upload the document. Error: $_"
+    }
+}#>
 
 # Enhanced PowerShell Experience
 Set-PSReadLineOption -Colors @{
@@ -220,8 +238,7 @@ Set-PSReadLineOption -Colors @{
     String = 'DarkCyan'
 }
 
-## Final Line to set prompt
-
+# Final Line to set prompt
 if (Get-Command zoxide -ErrorAction SilentlyContinue) {
     Invoke-Expression (& { (zoxide init powershell | Out-String) })
 } else {
@@ -232,7 +249,6 @@ if (Get-Command zoxide -ErrorAction SilentlyContinue) {
         Invoke-Expression (& { (zoxide init powershell | Out-String) })
     } catch {
         Write-Error "Failed to install zoxide. Error: $_"
-    }
-}
-
+    } 
+ }
 (@(& 'C:/Users/peter.abbasi/AppData/Local/Programs/oh-my-posh/bin/oh-my-posh.exe' init pwsh --config='C:\Users\peter.abbasi\AppData\Local\oh-my-posh\config.aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0phbkRlRG9iYmVsZWVyL29oLW15LXBvc2gvbWFpbi90aGVtZXMvY29iYWx0Mi5vbXAuanNvbg==.omp.json' --print) -join "`n") | Invoke-Expression

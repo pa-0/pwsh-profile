@@ -196,7 +196,7 @@ function lazyg {
     git commit -m "$args"
     git push
 }
-function grb { param($owner, $repo) ghrel "$owner"/"$repo" } # Run ghrel
+function grb { param($owner, $repo) ghrel -v "${owner}"/"${repo}" } # Run ghrel
   
 # Quick Access to System Info
 function sysinfo { Get-ComputerInfo }

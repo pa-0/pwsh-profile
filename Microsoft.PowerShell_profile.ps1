@@ -12,15 +12,15 @@ Import-Module -Name Terminal-Icons
 
 # Check for Profile Updates
 function Update-Profile {
-    Write-Host "Checking for updates to " -ForegroundColor DarkYellow -NoNewLine
+    Write-Host "Checking for updates to " -ForegroundColor Yellow -NoNewLine
     Write-Host "PowerShell `$PROFILE" -ForegroundColor Green -NoNewLine
-    Write-Host "." -ForegroundColor DarkYellow -NoNewLine
-    Start-Sleep -Milliseconds 250
-    Write-Host "." -ForegroundColor DarkYellow -NoNewLine
-    Start-Sleep -Milliseconds 250
-    Write-Host "." -ForegroundColor DarkYellow -NoNewLine
-    Start-Sleep -Milliseconds 250
-    Write-Host "." -ForegroundColor DarkYellow -NoNewLine
+    Write-Host "." -ForegroundColor Yellow -NoNewLine
+    Start-Sleep -Milliseconds 500
+    Write-Host "." -ForegroundColor Yellow -NoNewLine
+    Start-Sleep -Milliseconds 500
+    Write-Host "." -ForegroundColor Yellow -NoNewLine
+    Start-Sleep -Milliseconds 500
+    Write-Host "." -ForegroundColor Yellow
     if (-not $global:canConnectToGitHub) {
         Write-Host "ERROR: Could not connect to GitHub.com. Please check your connection and try again later." -ForegroundColor DarkRed
         return

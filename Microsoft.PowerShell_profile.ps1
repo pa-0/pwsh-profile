@@ -69,7 +69,7 @@ $EDITOR = if (Test-CommandExists nvim) { 'code' }
 Set-Alias -Name vim -Value $EDITOR
 
 # App Installs
-$appcheck = @(gh, jq, git, ghrel, gh-org, papeer, pandoc, go, py, ffmpeg, 
+# $appcheck = @(gh, jq, git, ghrel, gh-org, papeer, pandoc, go, py, ffmpeg, 
 # TODO - add logic to limit installs to elevated prompt
 # go install github.com/jreisinger/ghrel@latest
 # go install github.com/lapwat/papeer@latest 
@@ -112,10 +112,10 @@ function unzip ($file) {
     Expand-Archive -Path $fullFile -DestinationPath $pwd
 }
 
-function Unblock-Dir { dir -r | Unblock-File }
-function Unblock-Dirv { dir -r | Unblock-File -v }
+function Unblock-Dir { Get-ChildItem -r | Unblock-File }
+function Unblock-Dirv { Get-ChildItem -r | Unblock-File -v }
 Set-Alias -Name rmow -Value Unblock-Dir
-Set Alias -Name rmov -Value Unblock-Dirv
+Set-Alias -Name rmov -Value Unblock-Dirv
 
 
 function grep($regex, $dir) {
@@ -169,7 +169,7 @@ function mkcd { param($dir) mkdir $dir -Force; Set-Location $dir }
 # Folder Nav
 function docs { Set-Location -Path $HOME\Documents }
 function dtop { Set-Location -Path $HOME\Desktop }
-function dc { cd ..}
+function dc { Set-Location ..}
 
 # Edit POSH Profile
 function ep { vim $PROFILE }

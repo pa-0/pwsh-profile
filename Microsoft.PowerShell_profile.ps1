@@ -68,7 +68,7 @@ $EDITOR = if (Test-CommandExists nvim) { 'code' }
           else { 'notepad' }
 Set-Alias -Name vim -Value $EDITOR
 
-# App Installs
+<# App Installs
 # $appcheck = @(gh, jq, git, ghrel, gh-org, papeer, pandoc, go, py, ffmpeg, 
 # TODO - add logic to limit installs to elevated prompt
 # go install github.com/jreisinger/ghrel@latest
@@ -79,7 +79,7 @@ Set-Alias -Name vim -Value $EDITOR
 # winget install -Name pandoc --scope Machine
 #  winget install --id GoLang.Go --scope Machine -s
 #$TODL = if (-not (Test-CommandExists gh){  }
-
+  winget install "The Silver Searcher" -scope machine #>
 # Edit POSH$PROFILE
 function Edit-Profile { vim $PROFILE.CurrentUserAllHosts }
 Set-Alias -Name epah -Value Edit-Profile

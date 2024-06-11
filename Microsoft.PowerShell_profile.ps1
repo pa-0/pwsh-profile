@@ -69,17 +69,21 @@ $EDITOR = if (Test-CommandExists nvim) { 'code' }
 Set-Alias -Name vim -Value $EDITOR
 
 <# App Installs
-# $appcheck = @(gh, jq, git, ghrel, gh-org, papeer, pandoc, go, py, ffmpeg, 
-# TODO - add logic to limit installs to elevated prompt
-# go install github.com/jreisinger/ghrel@latest
-# go install github.com/lapwat/papeer@latest 
-# ghrel caarlos0/fork-cleaner
-# winget install --id GitHub.cli --scope Machine -s # else winget upgrade
-# winget install --Id jqlang.jq --scope Machine -s # else winget upgrade
-# winget install -Name pandoc --scope Machine
-#  winget install --id GoLang.Go --scope Machine -s
-#$TODL = if (-not (Test-CommandExists gh){  }
-  winget install "The Silver Searcher" -scope machine #>
+TODO - add logic to limit installs to elevated prompt
+$appcheck = @(gh, jq, git, ghrel, gh-org, papeer, pandoc, go, py, ffmpeg, 
+$TODL = if (-not (Test-CommandExists gh){  
+    go install github.com/jreisinger/ghrel@latest
+    go install github.com/lapwat/papeer@latest 
+    ghrel caarlos0/fork-cleaner
+    winget install --id GitHub.cli --scope Machine -s # else winget upgrade
+    winget install --Id jqlang.jq --scope Machine -s # else winget upgrade
+    winget install -Name pandoc --scope Machine
+    winget install --id GoLang.Go --scope Machine -s
+    winget install "The Silver Searcher" -scope machine 
+    winget install -e --id rsteube.Carapace 
+}
+#>
+  
 # Edit POSH$PROFILE
 function Edit-Profile { vim $PROFILE.CurrentUserAllHosts }
 Set-Alias -Name epah -Value Edit-Profile
@@ -235,11 +239,15 @@ function pst { Get-Clipboard }
 }#>
 
 # Enhanced PowerShell Experience
-Set-PSReadLineOption -Colors @{
+# ~/.config/powershell/Microsoft.PowerShell_profile.ps1
+<# Set-PSReadLineOption -Colors @{
     Command = 'Yellow'
     Parameter = 'Green'
     String = 'DarkCyan'
-}
+}#>
+Set-PSReadLineOption -Colors @{ "Selection" = "`e[7m" }
+Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
+carapace _carapace | Out-String | Invoke-Expression
 
 # Final Line to set prompt
 if (Get-Command zoxide -ErrorAction SilentlyContinue) {

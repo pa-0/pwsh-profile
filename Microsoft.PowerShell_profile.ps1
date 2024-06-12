@@ -80,7 +80,8 @@ $TODL = if (-not (Test-CommandExists gh){
     winget install -Name pandoc --scope Machine
     winget install --id GoLang.Go --scope Machine -s
     winget install "The Silver Searcher" -scope machine 
-    winget install -e --id rsteube.Carapace 
+    nvm use 21.0.0
+    npm  install -g @microsoft/inshellisense 
 }
 #>
   

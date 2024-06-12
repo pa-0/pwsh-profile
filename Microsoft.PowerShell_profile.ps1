@@ -261,6 +261,4 @@ if (Get-Command zoxide -ErrorAction SilentlyContinue) {
     } 
  }
 (@(& 'C:/Users/peter.abbasi/AppData/Local/Programs/oh-my-posh/bin/oh-my-posh.exe' init pwsh --config='C:\Users\peter.abbasi\AppData\Local\oh-my-posh\config.aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0phbkRlRG9iYmVsZWVyL29oLW15LXBvc2gvbWFpbi90aGVtZXMvY29iYWx0Mi5vbXAuanNvbg==.omp.json' --print) -join "`n") | Invoke-Expression
-Set-PSReadLineOption -Colors @{ "Selection" = "`e[7m" }
-Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
-carapace _carapace | Out-String | Invoke-Expression
+is init powershell

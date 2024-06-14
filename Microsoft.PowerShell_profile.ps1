@@ -1,5 +1,5 @@
 ### Microsoft.PowerShell_profile Version
-$global:PoshProfVersionNo = 0.3 
+$global:PoshProfVersionNo = 0.5 
 # Initial GitHub.com connectivity check with 2 second timeout
 $global:canConnectToGitHub = Test-Connection github.com -Count 2 -Quiet -TimeoutSeconds 1
 
@@ -80,6 +80,7 @@ $TODL = if (-not (Test-CommandExists gh){
     winget install -Name pandoc --scope Machine
     winget install --id GoLang.Go --scope Machine -s
     winget install "The Silver Searcher" -scope machine 
+    TODO 'pnpm install command here'
     nvm use 21.0.0
     npm  install -g @microsoft/inshellisense 
 }
@@ -262,4 +263,6 @@ if (Get-Command zoxide -ErrorAction SilentlyContinue) {
     } 
  }
 (@(& 'C:/Users/peter.abbasi/AppData/Local/Programs/oh-my-posh/bin/oh-my-posh.exe' init pwsh --config='C:\Users\peter.abbasi\AppData\Local\oh-my-posh\config.aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0phbkRlRG9iYmVsZWVyL29oLW15LXBvc2gvbWFpbi90aGVtZXMvY29iYWx0Mi5vbXAuanNvbg==.omp.json' --print) -join "`n") | Invoke-Expression
-is init powershell
+
+# Uncomment once inshellisense gets more stable
+# is init powershell

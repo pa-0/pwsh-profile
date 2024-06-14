@@ -4,11 +4,23 @@ A stylish and functional PowerShell profile that looks and feels almost as good 
 
 ## ⚡ One Line Install (Elevated PowerShell Recommended)
 
-Execute the following command in an elevated PowerShell window to install the PowerShell profile:
+Execute the following command in an elevated PowerShell window to install the PowerShell profile...
 
+<ins>for `pwsh.exe` (PowerShell Core's standalone shell)</ins>:
+
+```bash
+irm "https://github.com/poa00/powershell-profile/raw/poa00.profile/setup.ps1" | iex
 ```
-irm "https://github.com/ChrisTitusTech/powershell-profile/raw/main/setup.ps1" | iex
+
+>[`pwsh` profile - direct link)](https://github.com/poa00/powershell.profile/raw/poa00.profile/setup.ps1)
+
+<ins>for `code.exe` (Visual Studio Code's integrated terminal)</ins>:
+
+```bash
+irm "https://github.com/poa00/powershell.profile/raw/poa00.profile/setupVSC.ps1" | iex
 ```
+
+>[`code` profile - direct link](https://github.com/poa00/powershell.profile/raw/poa00.profile/setupVSC.ps1)
 
 ## 🛠️ Fix the Missing Font
 

@@ -1,4 +1,4 @@
-$modules = @( 'PSReadLine', 'posh-git', 'oh-my-posh', 'Get-ChildItemColor' )
+$modules = @( 'PSReadLine', 'posh-git', 'oh-my-posh', 'Get-ChildItemColor', 'MetaProgramming', 'Terminal-Icons' )
 
 foreach ($m in $modules) {
     Write-Output "Checking $m"

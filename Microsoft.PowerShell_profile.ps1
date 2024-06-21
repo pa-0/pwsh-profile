@@ -10,6 +10,11 @@ if (-not (Get-Module -ListAvailable -Name Terminal-Icons)) {
 }
 Import-Module -Name Terminal-Icons
 
+if (-not (Get-Module -ListAvailable -Name PSReadline)) {
+    Install-Module -Name PSReadline -Scope CurrentUser -AllowPrerelease -Force
+}
+Import-Module -Name PSReadline
+
 # Check for Profile Updates
 function Update-Profile {
     Write-Host "Checking for updates to " -ForegroundColor Yellow -NoNewLine
@@ -123,7 +128,6 @@ function Unblock-Dir { Get-ChildItem -r | Unblock-File }
 function Unblock-Dirv { Get-ChildItem -r | Unblock-File -v }
 Set-Alias -Name rmow -Value Unblock-Dir
 Set-Alias -Name rmov -Value Unblock-Dirv
-
 
 function grep($regex, $dir) {
     if ( $dir ) {
@@ -252,10 +256,9 @@ function Get-Args{
 # ~/.config/powershell/Microsoft.PowerShell_profile.ps1
 <# Set-PSReadLineOption -Colors @{
     Command = 'Yellow'
-    Parameter = 'Green'
+    Parameter = 'Fuschia'
     String = 'DarkCyan'
 }#>
-
 
 # Final Line to set prompt
 if (Get-Command zoxide -ErrorAction SilentlyContinue) {

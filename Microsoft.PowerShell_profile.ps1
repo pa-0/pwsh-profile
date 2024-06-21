@@ -118,6 +118,7 @@ function unzip ($file) {
     Expand-Archive -Path $fullFile -DestinationPath $pwd
 }
 
+# Mark-of-the-Web
 function Unblock-Dir { Get-ChildItem -r | Unblock-File }
 function Unblock-Dirv { Get-ChildItem -r | Unblock-File -v }
 Set-Alias -Name rmow -Value Unblock-Dir
@@ -203,7 +204,7 @@ function lazyg {
     git push
 }
 
-#Git Aliases
+# Git Aliases
 Set-Alias -Name grb  -Value ghrel
 Set-Alias -Name glab -Value gitlab
 Set-Alias -Name glb  -Value gitlab-download-release
@@ -216,6 +217,13 @@ function flushdns { Clear-DnsClientCache }
 # Clipboard Tools
 function cpy { Set-Clipboard $args[0] }
 function pst { Get-Clipboard }
+
+# PowerShell Tools
+function Get-Args{
+     Param([string]$command)
+     [management.automation.psparser]::Tokenize($command,[ref]$null)
+} #end function Get-Args
+
 
 <#function hb {
     if ($args.Length -eq 0) {

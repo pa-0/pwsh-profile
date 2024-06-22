@@ -52,7 +52,7 @@ $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIden
 function prompt {
     if ($isAdmin) { "[" + (Get-Location) + "] # " } else { "[" + (Get-Location) + "] $ " }
 }
-$adminSuffix = if ($isAdmin) { " [jefe]" } else { "" }
+$adminSuffix = if ($isAdmin) { " [JEFE]" } else { "" }
 $Host.UI.RawUI.WindowTitle = "PowerShell {0}$adminSuffix" -f $PSVersionTable.PSVersion.ToString()
 
 # Utility Functions
@@ -90,10 +90,10 @@ $TODL = if (-not (Test-CommandExists gh){
     npm  install -g @microsoft/inshellisense 
 }
 #>
-  
+
 # Edit POSH$PROFILE
-function Edit-Profile { vim $PROFILE.CurrentUserAllHosts }
-Set-Alias -Name epah -Value Edit-Profile
+function Edit-Profile { start microsoft-edge:https://github.com/poa00/powershell.profile/edit/poa00.profile/Microsoft.PowerShell_profile.ps1 }
+Set-Alias -Name ep -Value Edit-Profile
 
 function touch($file) { "" | Out-File $file -Encoding ASCII }
 
@@ -182,9 +182,6 @@ function docs { Set-Location -Path $HOME\Documents }
 function dtop { Set-Location -Path $HOME\Desktop }
 function dc { Set-Location ..}
 
-# Edit POSH Profile
-function ep { vim $PROFILE }
-
 # Taskkiller
 function k9 { Stop-Process -Name $args[0] }
 
@@ -256,7 +253,7 @@ function Get-Args{
 # ~/.config/powershell/Microsoft.PowerShell_profile.ps1
 <# Set-PSReadLineOption -Colors @{
     Command = 'Yellow'
-    Parameter = 'Fuschia'
+    Parameter = 'Green'
     String = 'DarkCyan'
 }#>
 

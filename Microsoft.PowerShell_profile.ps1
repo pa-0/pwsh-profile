@@ -1,5 +1,5 @@
 ### Microsoft.PowerShell_profile Version
-$global:PoshProfVersionNo = 0.55 
+$global:PoshProfVersionNo = 0.56 
 # Initial GitHub.com connectivity check with 2 second timeout
 $global:canConnectToGitHub = Test-Connection github.com -Count 2 -Quiet -TimeoutSeconds 1
 
@@ -258,6 +258,7 @@ function Get-Args{
 }#>
 
 # Final Line to set prompt
+oh-my-posh init pwsh --config https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/cobalt2.omp.json | Invoke-Expression
 if (Get-Command zoxide -ErrorAction SilentlyContinue) {
     Invoke-Expression (& { (zoxide init powershell | Out-String) })
 } else {
@@ -270,7 +271,7 @@ if (Get-Command zoxide -ErrorAction SilentlyContinue) {
         Write-Error "Failed to install zoxide. Error: $_"
     } 
  }
-(@(& 'C:/Users/peter.abbasi/AppData/Local/Programs/oh-my-posh/bin/oh-my-posh.exe' init pwsh --config='C:\Users\peter.abbasi\AppData\Local\oh-my-posh\config.aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL0phbkRlRG9iYmVsZWVyL29oLW15LXBvc2gvbWFpbi90aGVtZXMvY29iYWx0Mi5vbXAuanNvbg==.omp.json' --print) -join "`n") | Invoke-Expression
-
+ 
 # Uncomment once inshellisense gets more stable
 # is init powershell
+

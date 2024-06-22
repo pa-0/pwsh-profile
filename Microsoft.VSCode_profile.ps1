@@ -51,7 +51,7 @@ function global:prompt {
 }
 
 ### Microsoft.PowerShell_profile Version
-$global:PoshProfVersionNo = 0.5 
+$global:PoshProfVersionNo = 0.11
 # Initial GitHub.com connectivity check with 2 second timeout
 $global:canConnectToGitHub = Test-Connection github.com -Count 2 -Quiet -TimeoutSeconds 1
 
@@ -68,7 +68,7 @@ if (-not (Get-Module -ListAvailable -Name PSReadline)) {
 Import-Module -Name PSReadline
 
 # Check for Profile Updates
-function Update-Profile {
+function Get-ProfileUpdates {
     Write-Host "Checking for updates to " -ForegroundColor Yellow -NoNewLine
     Write-Host "PowerShell `$PROFILE" -ForegroundColor Green -NoNewLine
     Write-Host "." -ForegroundColor Yellow -NoNewLine
@@ -84,20 +84,20 @@ function Update-Profile {
     } try {
         $url = "https://raw.githubusercontent.com/poa00/powershell.profile/poa00.profile/Microsoft.VSCode_profile.ps1"
         $oldhash = Get-FileHash $PROFILE
-        Invoke-RestMethod $url -OutFile "$env:temp/Microsoft.PowerShell_profile.ps1"
-        $newhash = Get-FileHash "$env:temp/Microsoft.PowerShell_profile.ps1"
+        Invoke-RestMethod $url -OutFile "$env:temp/Microsoft.VSCode_profile.ps1"
+        $newhash = Get-FileHash "$env:temp/Microsoft.VSCode_profile.ps1"
         if ($newhash.Hash -ne $oldhash.Hash) {
-            Copy-Item -Path "$env:temp/Microsoft.PowerShell_profile.ps1" -Destination $PROFILE -Force
+            Copy-Item -Path "$env:temp/Microsoft.VSCode_profile.ps1" -Destination $PROFILE -Force
             Write-Host "Profile updated successfully." -ForegroundColor Green
             Write-Host "Restart the shell to apply changes" -ForegroundColor Magenta
         }
     } catch {
-        Write-Error "Unable to check for `$profile updates"
+        Write-Error "Unable to check for `$PROFILE updates"
     } finally {
         Remove-Item "$env:temp/Microsoft.VSCode_profile.ps1" -ErrorAction SilentlyContinue
     }
 }
-Update-Profile
+Get-ProfileUpdates
 
 # Admin Check and Prompt Customization
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -115,17 +115,18 @@ function Test-CommandExists {
 }
 
 # Editor Configuration
-$EDITOR = if (Test-CommandExists nvim) { 'code' }
+$EDITOR = if (Test-CommandExists nvim) { 'nvim' }
           elseif (Test-CommandExists pvim) { 'pvim' }
           elseif (Test-CommandExists vim) { 'vim' }
           elseif (Test-CommandExists vi) { 'vi' }
-          elseif (Test-CommandExists code) { 'nvimad' }
+          elseif (Test-CommandExists code) { 'code' }
           elseif (Test-CommandExists notepad++) { 'notepad++' }
           elseif (Test-CommandExists sublime_text) { 'sublime_text' }
           else { 'notepad' }
 Set-Alias -Name vim -Value $EDITOR
 
-<# App Installs
+<# 
+# App Installs
 TODO - add logic to limit installs to elevated prompt
 $appcheck = @(gh, jq, git, ghrel, gh-org, papeer, pandoc, go, py, ffmpeg, 
 $TODL = if (-not (Test-CommandExists gh){  
@@ -143,9 +144,12 @@ $TODL = if (-not (Test-CommandExists gh){
 }
 #>
   
-# Edit POSH$PROFILE
-function Edit-Profile { vim $PROFILE.CurrentUserCurrentHost }
-Set-Alias -Name epah -Value Edit-Profile
+# Edit POSH $PROFILE
+function Edit-Profile { 
+    start microsoft-edge:https://github.com/poa00/powershell.profile/edit/poa00.profile/Microsoft.VSCode_profile.ps1 
+}
+
+Set-Alias -Name ep -Value Edit-Profile
 
 function touch($file) { "" | Out-File $file -Encoding ASCII }
 
@@ -183,10 +187,10 @@ Set-Alias -Name rmov -Value Unblock-Dirv
 
 function grep($regex, $dir) {
     if ( $dir ) {
-        Get-ChildItem $dir | select-string $regex
+        Get-ChildItem $dir | Select-String $regex
         return
     }
-    $input | select-string $regex
+    $input | Select-String $regex
 }
 
 function df {
@@ -202,7 +206,7 @@ function which($name) {
 }
 
 function export($name, $value) {
-    set-item -force -path "env:$name" -value $value;
+    Set-Item -force -path "env:$name" -value $value;
 }
 
 function pkill($name) {
@@ -234,9 +238,6 @@ function docs { Set-Location -Path $HOME\Documents }
 function dtop { Set-Location -Path $HOME\Desktop }
 function dc { Set-Location ..}
 
-# Edit POSH Profile
-function ep { vim $PROFILE }
-
 # Taskkiller
 function k9 { Stop-Process -Name $args[0] }
 
@@ -264,6 +265,7 @@ function lazyg {
 Set-Alias -Name grb  -Value ghrel
 Set-Alias -Name glab -Value gitlab
 Set-Alias -Name glb  -Value gitlab-download-release
+
 # Quick Access to System Info
 function sysinfo { Get-ComputerInfo }
 

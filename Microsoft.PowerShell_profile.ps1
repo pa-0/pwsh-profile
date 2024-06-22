@@ -1,5 +1,5 @@
 ### Microsoft.PowerShell_profile Version
-$global:PoshProfVersionNo = 0.5 
+$global:PoshProfVersionNo = 0.55 
 # Initial GitHub.com connectivity check with 2 second timeout
 $global:canConnectToGitHub = Test-Connection github.com -Count 2 -Quiet -TimeoutSeconds 1
 

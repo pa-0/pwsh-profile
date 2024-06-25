@@ -44,7 +44,7 @@ function Update-Profile {
     Start-Sleep -Milliseconds 600
     Write-Host "." -ForegroundColor Yellow
     if (-not $global:canConnectToGitHub) {
-        Write-Host "ERROR: Could not connect to GitHub.com. Please check your connection and try again later." -ForegroundColor DarkRed
+        Write-Host "ERROR: Unable to reach GitHub.com. Please check your connection and try again later." -ForegroundColor DarkRed
         return
     } 
     try {

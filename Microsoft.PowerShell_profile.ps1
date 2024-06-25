@@ -1,5 +1,22 @@
-### Microsoft.PowerShell_profile Version
-$global:PoshProfVersionNo = 0.56 
+### PowerShell Profile Refactor
+### Version 1.03 - Refactored
+
+#################################################################################################################################
+############                                                                                                         ############
+############                                          !!!   WARNING:   !!!                                           ############
+############                                                                                                         ############
+############                DO NOT MODIFY THIS FILE. THIS FILE IS HASHED AND UPDATED AUTOMATICALLY.                  ############
+############                    ANY CHANGES MADE TO THIS FILE WILL BE OVERWRITTEN BY COMMITS TO                      ############
+############                            https://github.com/poa00/powershell.profile.git                           ############
+############                                                                                                      ############
+#######!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!########
+############                                                                                                      ############
+############                      IF YOU WANT TO MAKE CHANGES, USE THE Edit-Profile FUNCTION                      ############
+############                              AND SAVE YOUR CHANGES IN THE FILE CREATED.                              ############
+############                                                                                                      ############
+##############################################################################################################################
+
+$global:PoshProfVersionNo = 1.03
 # Initial GitHub.com connectivity check with 2 second timeout
 $global:canConnectToGitHub = Test-Connection github.com -Count 2 -Quiet -TimeoutSeconds 1
 
@@ -29,7 +46,8 @@ function Update-Profile {
     if (-not $global:canConnectToGitHub) {
         Write-Host "ERROR: Could not connect to GitHub.com. Please check your connection and try again later." -ForegroundColor DarkRed
         return
-    } try {
+    } 
+    try {
         $url = "https://raw.githubusercontent.com/poa00/powershell.profile/poa00.profile/Microsoft.PowerShell_profile.ps1"
         $oldhash = Get-FileHash $PROFILE
         Invoke-RestMethod $url -OutFile "$env:temp/Microsoft.PowerShell_profile.ps1"
@@ -47,6 +65,36 @@ function Update-Profile {
 }
 Update-Profile
 
+function Update-PowerShell {
+    if (-not $global:canConnectToGitHub) {
+        Write-Host "Skipping PowerShell update check due to GitHub.com not responding within 1 second." -ForegroundColor Yellow
+        return
+    }
+
+    try {
+        Write-Host "Checking for PowerShell updates..." -ForegroundColor Cyan
+        $updateNeeded = $false
+        $currentVersion = $PSVersionTable.PSVersion.ToString()
+        $gitHubApiUrl = "https://api.github.com/repos/PowerShell/PowerShell/releases/latest"
+        $latestReleaseInfo = Invoke-RestMethod -Uri $gitHubApiUrl
+        $latestVersion = $latestReleaseInfo.tag_name.Trim('v')
+        if ($currentVersion -lt $latestVersion) {
+            $updateNeeded = $true
+        }
+
+        if ($updateNeeded) {
+            Write-Host "Updating PowerShell..." -ForegroundColor Yellow
+            winget upgrade "Microsoft.PowerShell" --accept-source-agreements --accept-package-agreements
+            Write-Host "PowerShell has been updated. Please restart your shell to reflect changes" -ForegroundColor Magenta
+        } else {
+            Write-Host "Your PowerShell is up to date." -ForegroundColor Green
+        }
+    } catch {
+        Write-Error "Failed to update PowerShell. Error: $_"
+    }
+}
+Update-PowerShell
+
 # Admin Check and Prompt Customization
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 function prompt {
@@ -63,11 +111,11 @@ function Test-CommandExists {
 }
 
 # Editor Configuration
-$EDITOR = if (Test-CommandExists nvim) { 'code' }
+$EDITOR = if (Test-CommandExists nvim) { 'nvim' }
           elseif (Test-CommandExists pvim) { 'pvim' }
           elseif (Test-CommandExists vim) { 'vim' }
           elseif (Test-CommandExists vi) { 'vi' }
-          elseif (Test-CommandExists code) { 'nvimad' }
+          elseif (Test-CommandExists code) { 'code' }
           elseif (Test-CommandExists notepad++) { 'notepad++' }
           elseif (Test-CommandExists sublime_text) { 'sublime_text' }
           else { 'notepad' }
@@ -91,22 +139,43 @@ $TODL = if (-not (Test-CommandExists gh){
 }
 #>
 
-# Edit POSH$PROFILE
-function Edit-Profile { start microsoft-edge:https://github.com/poa00/powershell.profile/edit/poa00.profile/Microsoft.PowerShell_profile.ps1 }
+# Edit $PROFILE
+function Edit-GHProfile { 
+    start microsoft-edge:https://github.com/poa00/powershell.profile/edit/poa00.profile/Microsoft.PowerShell_profile.ps1 
+}
 Set-Alias -Name ep -Value Edit-Profile
-
+function Edit-PCProfile {
+    vim $PROFILE.CurrentUserAllHosts
+}
 function touch($file) { "" | Out-File $file -Encoding ASCII }
 
 function ff($name) {
     Get-ChildItem -recurse -filter "*${name}*" -ErrorAction SilentlyContinue | ForEach-Object {
-        Write-Output "$($_.directory)\$($_)"
+        Write-Output "$($_.FullName)"
     }
 }
 
 # Network Utilities
 function Get-PubIP { (Invoke-WebRequest http://ifconfig.me/ip).Content }
 
+# Open WinUtil
+function winutil {
+	iwr -useb https://christitus.com/win | iex
+}
+
 # System Utilities
+function admin {
+    if ($args.Count -gt 0) {
+        $argList = "& '$args'"
+        Start-Process wt -Verb runAs -ArgumentList "pwsh.exe -NoExit -Command $argList"
+    } else {
+        Start-Process wt -Verb runAs
+    }
+}
+
+# Set UNIX-like aliases for the admin command, so sudo <command> will run the command with elevated rights.
+Set-Alias -Name su -Value admin
+
 function uptime {
     if ($PSVersionTable.PSVersion.Major -eq 5) {
         Get-WmiObject win32_operatingsystem | Select-Object @{Name='LastBootUpTime'; Expression={$_.ConverttoDateTime($_.lastbootuptime)}} | Format-Table -HideTableHeaders
@@ -115,7 +184,9 @@ function uptime {
     }
 }
 
-function Restart-Profile { & $profile }
+function Restart-Profile { 
+    & $profile 
+}
 
 function unzip ($file) {
     Write-Output("Extracting", $file, "to", $pwd)
@@ -123,11 +194,31 @@ function unzip ($file) {
     Expand-Archive -Path $fullFile -DestinationPath $pwd
 }
 
-# Mark-of-the-Web
-function Unblock-Dir { Get-ChildItem -r | Unblock-File }
-function Unblock-Dirv { Get-ChildItem -r | Unblock-File -v }
-Set-Alias -Name rmow -Value Unblock-Dir
-Set-Alias -Name rmov -Value Unblock-Dirv
+function hb {
+    if ($args.Length -eq 0) {
+        Write-Error "No file path specified."
+        return
+    }
+    
+    $FilePath = $args[0]
+    
+    if (Test-Path $FilePath) {
+        $Content = Get-Content $FilePath -Raw
+    } else {
+        Write-Error "File path does not exist."
+        return
+    }
+    
+    $uri = "http://bin.christitus.com/documents"
+    try {
+        $response = Invoke-RestMethod -Uri $uri -Method Post -Body $Content -ErrorAction Stop
+        $hasteKey = $response.key
+        $url = "http://bin.christitus.com/$hasteKey"
+        Write-Output $url
+    } catch {
+        Write-Error "Failed to upload the document. Error: $_"
+    }
+}
 
 function grep($regex, $dir) {
     if ( $dir ) {
@@ -167,17 +258,20 @@ function head {
 }
 
 function tail {
-  param($Path, $n = 10)
-  Get-Content $Path -Tail $n
+  param($Path, $n = 10, [switch]$f = $false)
+  Get-Content $Path -Tail $n -Wait:$f
 }
 
 # Quick File Creation
 function nf { param($name) New-Item -ItemType "file" -Path . -Name $name }
 
+
+### Quality of Life Aliases
+
 # Create and Change Dir
 function mkcd { param($dir) mkdir $dir -Force; Set-Location $dir }
 
-# Folder Nav
+# Navigation Shortcuts
 function docs { Set-Location -Path $HOME\Documents }
 function dtop { Set-Location -Path $HOME\Desktop }
 function dc { Set-Location ..}
@@ -195,6 +289,7 @@ function ga { git add . }
 function gc { param($m) git commit -m "$m" }
 function gp { git push }
 function g  { z Github }
+function gcl { git clone "$args" }
 function gcom {
     git add .
     git commit -m "$args"
@@ -212,8 +307,11 @@ Set-Alias -Name glb  -Value gitlab-download-release
 # Quick Access to System Info
 function sysinfo { Get-ComputerInfo }
 
-# Net Tools
-function flushdns { Clear-DnsClientCache }
+# Networking Utilities
+function flushdns {
+	Clear-DnsClientCache
+	Write-Host "DNS has been flushed"
+}
 
 # Clipboard Tools
 function cpy { Set-Clipboard $args[0] }
@@ -226,41 +324,35 @@ function Get-Args{
 } #end function Get-Args
 
 
-<#function hb {
-    if ($args.Length -eq 0) {
-        Write-Error "No file path specified."
-        return
-    }
-    $FilePath = $args[0]
-    if (Test-Path $FilePath) {
-        $Content = Get-Content $FilePath -Raw
-    } else {
-        Write-Error "File path does not exist."
-        return
-    }
-    $uri = "http://bin.christitus.com/documents"
-    try {
-        $response = Invoke-RestMethod -Uri $uri -Method Post -Body $Content -ErrorAction Stop
-        $hasteKey = $response.key
-        $url = "http://bin.christitus.com/$hasteKey"
-        Write-Output $url
-    } catch {
-        Write-Error "Failed to upload the document. Error: $_"
-    }
-}#>
+# Mark-of-the-Web
+function Unblock-Dir { Get-ChildItem $args[0] -r | Unblock-File }
+Set-Alias -Name rmow -Value Unblock-Dir
+function Unblock-Dirv { Get-ChildItem $args[0]-r | Unblock-File -v }
+Set-Alias -Name rmov -Value Unblock-Dirv
 
 # Enhanced PowerShell Experience
-# ~/.config/powershell/Microsoft.PowerShell_profile.ps1
-<# Set-PSReadLineOption -Colors @{
+Set-PSReadLineOption -Colors @{
     Command = 'Yellow'
     Parameter = 'Green'
     String = 'DarkCyan'
-}#>
+}
 
-# Final Line to set prompt
-oh-my-posh init pwsh --config https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/cobalt2.omp.json | Invoke-Expression
+# Get theme from Profile.ps1 or use a default theme
+function Get-Theme {
+    if (Test-Path -Path $PROFILE.CurrentUserAllHosts -PathType leaf) {
+        $existingTheme = Select-String -Raw -Path $PROFILE.CurrentUserAllHosts -Pattern "oh-my-posh init pwsh --config"
+        if ($null -ne $existingTheme) {
+            Invoke-Expression $existingTheme
+            return
+        }
+    } else {
+        oh-my-posh init pwsh --config https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/cobalt2.omp.json | Invoke-Expression
+    }
+}
+## Final lines to get theme and set prompt
+Get-Theme
 if (Get-Command zoxide -ErrorAction SilentlyContinue) {
-    Invoke-Expression (& { (zoxide init powershell | Out-String) })
+    Invoke-Expression (& { (zoxide init --cmd cd powershell | Out-String) })
 } else {
     Write-Host "zoxide command not found. Attempting to install via winget..."
     try {
@@ -269,9 +361,97 @@ if (Get-Command zoxide -ErrorAction SilentlyContinue) {
         Invoke-Expression (& { (zoxide init powershell | Out-String) })
     } catch {
         Write-Error "Failed to install zoxide. Error: $_"
-    } 
- }
- 
+    }
+}
+
+# Help Function
+function Show-Help {
+    @"
+PowerShell Profile Help
+=======================
+
+Update-Profile - Checks for profile updates from a remote repository and updates if necessary.
+
+Update-PowerShell - Checks for the latest PowerShell release and updates if a new version is available.
+
+Edit-Profile - Opens the current user's profile for editing using the configured editor.
+
+touch <file> - Creates a new empty file.
+
+ff <name> - Finds files recursively with the specified name.
+
+Get-PubIP - Retrieves the public IP address of the machine.
+
+winutil - Runs the WinUtil script from Chris Titus Tech.
+
+uptime - Displays the system uptime.
+
+reload-profile - Reloads the current user's PowerShell profile.
+
+unzip <file> - Extracts a zip file to the current directory.
+
+hb <file> - Uploads the specified file's content to a hastebin-like service and returns the URL.
+
+grep <regex> [dir] - Searches for a regex pattern in files within the specified directory or from the pipeline input.
+
+df - Displays information about volumes.
+
+sed <file> <find> <replace> - Replaces text in a file.
+
+which <name> - Shows the path of the command.
+
+export <name> <value> - Sets an environment variable.
+
+pkill <name> - Kills processes by name.
+
+pgrep <name> - Lists processes by name.
+
+head <path> [n] - Displays the first n lines of a file (default 10).
+
+tail <path> [n] - Displays the last n lines of a file (default 10).
+
+nf <name> - Creates a new file with the specified name.
+
+mkcd <dir> - Creates and changes to a new directory.
+
+docs - Changes the current directory to the user's Documents folder.
+
+dtop - Changes the current directory to the user's Desktop folder.
+
+ep - Opens the profile for editing.
+
+k9 <name> - Kills a process by name.
+
+la - Lists all files in the current directory with detailed formatting.
+
+ll - Lists all files, including hidden, in the current directory with detailed formatting.
+
+gs - Shortcut for 'git status'.
+
+ga - Shortcut for 'git add .'.
+
+gc <message> - Shortcut for 'git commit -m'.
+
+gp - Shortcut for 'git push'.
+
+g - Changes to the GitHub directory.
+
+gcom <message> - Adds all changes and commits with the specified message.
+
+lazyg <message> - Adds all changes, commits with the specified message, and pushes to the remote repository.
+
+sysinfo - Displays detailed system information.
+
+flushdns - Clears the DNS cache.
+
+cpy <text> - Copies the specified text to the clipboard.
+
+pst - Retrieves text from the clipboard.
+
+Use 'Show-Help' to display this help message.
+"@
+}
+Write-Host "Use 'Show-Help' to display help"
+
 # Uncomment once inshellisense gets more stable
 # is init powershell
-

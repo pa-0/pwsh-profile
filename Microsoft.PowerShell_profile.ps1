@@ -1,13 +1,13 @@
 ### PowerShell Profile Refactor
 ### Version 1.03 - Refactored
 
-#################################################################################################################################
-############                                                                                                         ############
-############                                          !!!   WARNING:   !!!                                           ############
-############                                                                                                         ############
-############                DO NOT MODIFY THIS FILE. THIS FILE IS HASHED AND UPDATED AUTOMATICALLY.                  ############
-############                    ANY CHANGES MADE TO THIS FILE WILL BE OVERWRITTEN BY COMMITS TO                      ############
-############                            https://github.com/poa00/powershell.profile.git                           ############
+##############################################################################################################################
+############                                                                                                      ############
+############                                         !!!   WARNING:   !!!                                         ############
+############                                                                                                      ############
+############               DO NOT MODIFY THIS FILE. THIS FILE IS HASHED AND UPDATED AUTOMATICALLY.                ############
+############                   ANY CHANGES MADE TO THIS FILE WILL BE OVERWRITTEN BY COMMITS TO                    ############
+############                           https://github.com/poa00/powershell.profile.git                            ############
 ############                                                                                                      ############
 #######!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!########
 ############                                                                                                      ############

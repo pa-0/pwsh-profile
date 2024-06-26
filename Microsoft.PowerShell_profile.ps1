@@ -1,5 +1,5 @@
 ### PowerShell Profile Refactor
-### Version 1.03 - Refactored
+### Version 1.04 - Refactored
 
 ##############################################################################################################################
 ############                                                                                                      ############
@@ -54,7 +54,7 @@ function Update-Profile {
         $newhash = Get-FileHash "$env:temp/Microsoft.PowerShell_profile.ps1"
         if ($newhash.Hash -ne $oldhash.Hash) {
             Copy-Item -Path "$env:temp/Microsoft.PowerShell_profile.ps1" -Destination $PROFILE -Force
-            Write-Host "Profile updated successfully." -ForegroundColor Green
+            Write-Host "Microsoft.PowerShell_profile.ps1 updated successfully." -ForegroundColor Green
             Write-Host "Restart the shell to apply changes" -ForegroundColor Magenta
         }
     } catch {
@@ -65,7 +65,7 @@ function Update-Profile {
 }
 Update-Profile
 
-function Update-PowerShell {
+<#function Update-PowerShell {
     if (-not $global:canConnectToGitHub) {
         Write-Host "Skipping PowerShell update check due to GitHub.com not responding within 1 second." -ForegroundColor Yellow
         return
@@ -93,7 +93,7 @@ function Update-PowerShell {
         Write-Error "Failed to update PowerShell. Error: $_"
     }
 }
-Update-PowerShell
+Update-PowerShell#>
 
 # Admin Check and Prompt Customization
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -140,13 +140,14 @@ $TODL = if (-not (Test-CommandExists gh){
 #>
 
 # Edit $PROFILE
-function Edit-GHProfile { 
-    start microsoft-edge:https://github.com/poa00/powershell.profile/edit/poa00.profile/Microsoft.PowerShell_profile.ps1 
+function Edit-EveryProfile { 
+    Start-Process microsoft-edge:https://github.com/poa00/powershell.profile/edit/poa00.profile/Microsoft.PowerShell_profile.ps1 
 }
-Set-Alias -Name ep -Value Edit-Profile
-function Edit-PCProfile {
+Set-Alias -Name eep -Value Edit-EveryProfile
+function Edit-LocalFile {
     vim $PROFILE.CurrentUserAllHosts
 }
+Set-Alias -Name elf -Value Edit-LocalFile
 function touch($file) { "" | Out-File $file -Encoding ASCII }
 
 function ff($name) {
@@ -160,7 +161,7 @@ function Get-PubIP { (Invoke-WebRequest http://ifconfig.me/ip).Content }
 
 # Open WinUtil
 function winutil {
-	iwr -useb https://christitus.com/win | iex
+	Invoke-WebRequest -useb https://christitus.com/win | Invoke-Expression
 }
 
 # System Utilities
@@ -337,7 +338,7 @@ Set-PSReadLineOption -Colors @{
     String = 'DarkCyan'
 }
 
-# Get theme from Profile.ps1 or use a default theme
+# Get theme from $env:USERPROFILE\Documents\PowerShell\profile.ps1 or use a default theme
 function Get-Theme {
     if (Test-Path -Path $PROFILE.CurrentUserAllHosts -PathType leaf) {
         $existingTheme = Select-String -Raw -Path $PROFILE.CurrentUserAllHosts -Pattern "oh-my-posh init pwsh --config"

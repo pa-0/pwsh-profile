@@ -133,6 +133,8 @@ $TODL = if (-not (Test-CommandExists gh){
     winget install -Name pandoc --scope Machine
     winget install --id GoLang.Go --scope Machine -s
     winget install "The Silver Searcher" -scope machine 
+    winget install fastfetch
+    winget install hyfetch???
     TODO 'pnpm install command here'
     nvm use 21.0.0
     npm  install -g @microsoft/inshellisense 

@@ -21,6 +21,7 @@ $global:PoshProfVersionNo = 1.03
 $global:canConnectToGitHub = Test-Connection github.com -Count 2 -Quiet -TimeoutSeconds 1
 
 # Import Modules and External Profiles
+# TODO Install-Module PSTree -Scope CurrentUser
 # Ensure Terminal-Icons module is installed before importing
 if (-not (Get-Module -ListAvailable -Name Terminal-Icons)) {
     Install-Module -Name Terminal-Icons -Scope CurrentUser -Force -SkipPublisherCheck

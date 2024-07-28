@@ -137,6 +137,10 @@ $TODL = if (-not (Test-CommandExists gh){
     winget install fastfetch
     winget install hyfetch???
     TODO 'pnpm install command here'
+    TODO Add 	#f45873b3-b655-43a6-b217-97c00aa0db58 PowerToys CommandNotFound module
+		Import-Module -Name Microsoft.WinGet.CommandNotFound
+		#f45873b3-b655-43a6-b217-97c00aa0db58
+	TODO Add Environmental Variables for GODIR, GITDIR and other .config locations
     nvm use 21.0.0
     npm  install -g @microsoft/inshellisense 
 }

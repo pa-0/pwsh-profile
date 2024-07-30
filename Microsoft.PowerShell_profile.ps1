@@ -15,8 +15,9 @@
 ############                              AND SAVE YOUR CHANGES IN THE FILE CREATED.                              ############
 ############                                                                                                      ############
 ##############################################################################################################################
+Set-ExecutionPolicy Bypass -Scope Process -Force
 
-$global:PoshProfVersionNo = 1.03
+$global:PoshProfVersionNo = 1.04
 # Initial GitHub.com connectivity check with 2 second timeout
 $global:canConnectToGitHub = Test-Connection github.com -Count 2 -Quiet -TimeoutSeconds 1
 
